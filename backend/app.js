@@ -1,5 +1,6 @@
 const express = require('express');
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
+const path = require('path');
 
 const userRoutes = require('./routes/user');
 
@@ -15,6 +16,8 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.urlencoded({ extended: true })); // Forcer le parse dans des objets inclus dans d'autres
 app.use(bodyParser.json()); 
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/auth', userRoutes);
 

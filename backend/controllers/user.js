@@ -1,8 +1,14 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const models = require('../models');
 const { Op } = require('sequelize');
 require("dotenv").config();
+
+//Constants
+const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const PASSWORD_REGEX = /^(?=.*\d).{4,8}$/;
+
 
 exports.signup = (req, res, next) => {
     
@@ -14,7 +20,17 @@ exports.signup = (req, res, next) => {
         return res.status(400).json({ 'error': 'Paramètres manquants' });
     }
 
+    if (username.length <= 3 || username.length >= 16) {
+        return res.status(400).json({ 'error': `Longueur du pseudo incorrecte, longueur acceptée : 4 à 15 caractères`});
+    }
     
+    if (!EMAIL_REGEX.test(email)) {
+        return res.status(400).json({ 'error': `Format de l'email non valide`});
+    }
+    if (!PASSWORD_REGEX.test(password)) {
+        return res.status(400).json({ 'error': `Mot de passe non valide : entre 4 et 8 lettres sans caractère spécial, incluant au minimum un chiffre)`});
+    }
+
     models.User.findOne({
         attributes: ['username', 'email'],
         where: { 
@@ -41,11 +57,9 @@ exports.signup = (req, res, next) => {
                     })
                     .catch(() => res.status(500).json({'error': 'Impossible de créer un nouvel utilisateur' }))
                 })
-
         } else {
             return res.status(409).json({ 'error': 'Cet utilisateur existe déjà' });
         }
-
     })
     .catch(() => { return res.status(500).json({ 'error': `Impossible de vérifier l'utilisateur` }) });
 }
@@ -58,7 +72,6 @@ exports.login = (req, res, next) => {
     if (email == null || password == null) {
         return res.status(400).json({ 'error': 'Paramètres manquants' });
     }
-
 
     models.User.findOne({
         where: { email: email }
@@ -88,4 +101,72 @@ exports.login = (req, res, next) => {
     .catch(() => {
         return res.status(500).json({ 'error': `Impossible de vérifier l'utilisateur`});
     })
+}
+
+exports.getMyProfile = (req, res, next) => {
+    
+    models.User.findOne({
+        attributes: ['id', 'username', 'email', 'imageUrl', 'aboutMe'],
+        where: { id: req.params.id }
+    }).then((user) => {
+        if (user) {
+            res.status(201).json(user);
+        } else {
+            res.status(404).json({ 'error': 'Utilisateur introuvable' });
+        }
+    }).catch(() => res.status(500).json({ 'error': 'cannot fetch user' }));
+}
+
+exports.updateProfile = (req, res, next) => {
+    models.User.findOne({
+        attributes: ['id', 'username', 'imageUrl', 'aboutMe'],
+        where: { id: req.body.id }
+    }).then((user) => {
+
+        let imgUrl = null; 
+        if (req.file) {
+            if (user.imageUrl) {
+                const filename = user.imageUrl.split('/images/')[1];
+                fs.unlinkSync(`images/${filename}`);
+            }
+            imgUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+        }
+
+        // Vérifier si le username a été modifié
+        if (req.body.username && req.body.username !== user.username) {
+
+            console.log('a changé');
+            if (req.body.username.length <= 3 || req.body.username.length >= 16) {
+                console.log('longueur !');
+                return res.status(400).json({ 'error': `Longueur du pseudo incorrecte, longueur acceptée : 4 à 15 caractères`});
+            }
+            
+            models.User.findOne({
+                attributes : ['username'],
+                where: { 
+                    username: req.body.username
+                }
+            }).then((userFound) => {
+                if (userFound) {
+                    return res.status(409).json({ 'error': 'Cet utilisateur existe déjà' });
+                } else {
+                    // répétition user.update !
+                    user.update({
+                        ...req.body,
+                        imageUrl: (imgUrl ? imgUrl : user.imageUrl),
+                        id: user.id
+                    })
+                    return res.status(200).json({ 'ok:': 'put reçu!'})
+                }
+            })
+        } else {
+                    // répétition user.update !
+            user.update({
+                ...req.body,
+                imageUrl: (imgUrl ? imgUrl : user.imageUrl),
+                id: user.id
+            })
+            return res.status(200).json({ 'ok:': 'put reçu!'})
+        }        
+    }).catch((e) => res.status(400).json({ 'error': 'erreur dans modify' }));
 }
