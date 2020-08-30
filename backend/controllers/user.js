@@ -150,23 +150,21 @@ exports.updateProfile = (req, res, next) => {
                 if (userFound) {
                     return res.status(409).json({ 'error': 'Cet utilisateur existe déjà' });
                 } else {
-                    // répétition user.update !
-                    user.update({
-                        ...req.body,
-                        imageUrl: (imgUrl ? imgUrl : user.imageUrl),
-                        id: user.id
-                    })
-                    return res.status(200).json({ 'ok:': 'put reçu!'})
+                    updateUser(user, imgUrl, req.body, res);
                 }
             })
         } else {
-                    // répétition user.update !
-            user.update({
-                ...req.body,
-                imageUrl: (imgUrl ? imgUrl : user.imageUrl),
-                id: user.id
-            })
-            return res.status(200).json({ 'ok:': 'put reçu!'})
+            updateUser(user, imgUrl, req.body, res);
         }        
-    }).catch((e) => res.status(400).json({ 'error': 'erreur dans modify' }));
+    }).catch((e) => res.status(400).json({ 'error': 'Utilisateur introuvable' }));
+}
+
+function updateUser(user, imgUrl, reqBody, res) {
+    user.update({
+        ...reqBody,
+        imageUrl: (imgUrl ? imgUrl : user.imageUrl),
+        id: user.id
+    }).then(() => {
+        return res.status(200).json({ message: 'Profil modifié avec succès' });
+    }).catch(() => { res.status(400).json({ 'error': 'Impossible de modifier le profil' }) });
 }
