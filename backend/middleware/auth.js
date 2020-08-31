@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
         if (req.body.id && req.body.id != userId) {
             throw 'User ID non valable !';
         } else {
-            console.log('next');
+            console.log('auth.js => next');
             next();
         }
     } catch (error) {
