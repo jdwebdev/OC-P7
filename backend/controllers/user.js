@@ -77,6 +77,9 @@ exports.login = (req, res, next) => {
         where: { email: email }
     })
     .then((user) => {
+
+        console.log('userCtrl : username :');
+        console.log(user.username);
         if (user) {
             bcrypt.compare(password, user.password)
                 .then( valid => {
@@ -85,6 +88,7 @@ exports.login = (req, res, next) => {
                     } 
                     res.status(200).json({
                         userId: user.id,
+                        username: user.username,
                         token: jwt.sign({ 
                                 userId: user.id,
                                 isAdmin: user.isAdmin 

@@ -51,7 +51,16 @@ exports.getPosts = (req, res, next) => {
         offset: (!isNaN(offset)) ? offset : null,
         include: [{
             model: models.User,
-            attributes: [ 'username' ]
+            attributes: [ 'username' ],
+        },
+        {
+            model: models.Comment,
+            as: 'commentPost',
+            attributes: [ 'id', 'content' ],
+            include: {
+                model: models.User,
+                attributes: [ 'username' ]
+            }
         }]
     }).then((posts) => {
         if (posts) {
