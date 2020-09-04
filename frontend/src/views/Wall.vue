@@ -20,7 +20,9 @@
             :dislikes="post.dislikes"
             :createdAt="post.createdAt"
             :comments="post.commentPost"
+            :postId="post.id"
             :key="post.id"
+            @refreshWallEvent="getAllPosts" 
         />
 
     </div>
@@ -44,30 +46,51 @@ export default {
     methods: {
         submitPost(e) {
             e.preventDefault();
-            const text = document.getElementById('post')
-            const file = document.getElementById('insertImg').files[0]
+            const id = this.userId
+            let input = document.getElementById('post')
+            let imgInput = document.getElementById('insertImg')
             
-            console.log(text.value)
-            console.log(file)
-            console.log(this.userId)
-            
+            const content = input.value
+            const file = imgInput.files[0]
+
+            const formData = new FormData()
+            formData.append('id', id)
+            formData.append('content', content)
+            formData.append('image', file)
+
             fetch('http://localhost:3000/api/post/new', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.token}`
                 },
                 mode:'cors',
-                body: {
-                    id: this.userId,
-                    content: text.value
-                }
+                body: formData
             }).then((response) => {
                 return response.json()
             }).then((r) => {
                 console.log(r)
+                input.value = ''
+                imgInput.value = null
+                this.getAllPosts()
             }).catch((e) => console.log(e))
         },
-        
+
+        getAllPosts() {
+            fetch('http://localhost:3000/api/post', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }}
+            )
+            .then((response) => response.json())
+            .then((posts) => {
+                this.posts = Object.keys(posts).map(k => posts[k])[0]
+                this.requestOk = true
+                
+            }).catch((e) => {
+                console.log(e)
+            })
+        }
     },
     computed: {
         ...mapState([
@@ -75,24 +98,9 @@ export default {
             'username',
             'token'
         ])
-    }, 
+    },
     created () {
-        fetch('http://localhost:3000/api/post', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${this.token}`
-            }}
-        )
-        .then((response) => response.json())
-        .then((posts) => {
-            console.log(typeof(posts))
-            this.posts = Object.keys(posts).map(k => posts[k])[0]
-            console.log(this.posts)
-            this.requestOk = true
-            
-        }).catch((e) => {
-            console.log(e)
-        })
+        this.getAllPosts()
     }
 }
 </script>

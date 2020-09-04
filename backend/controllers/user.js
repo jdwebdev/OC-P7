@@ -107,7 +107,7 @@ exports.login = (req, res, next) => {
     })
 }
 
-exports.getMyProfile = (req, res, next) => {
+exports.getMyProfile = (req, res) => {
     
     models.User.findOne({
         attributes: ['id', 'username', 'email', 'imageUrl', 'aboutMe'],
@@ -121,7 +121,7 @@ exports.getMyProfile = (req, res, next) => {
     }).catch(() => res.status(500).json({ 'error': 'cannot fetch user' }));
 }
 
-exports.updateProfile = (req, res, next) => {
+exports.updateProfile = (req, res) => {
     models.User.findOne({
         attributes: ['id', 'username', 'imageUrl', 'aboutMe'],
         where: { id: req.body.id }

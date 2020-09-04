@@ -2,7 +2,7 @@
   <div id="app">
       <Header />
       <router-link to="/">Home</router-link>
-      <!-- <router-link to="/about">About</router-link> -->
+      <router-link to="/Profile">Profil</router-link>
       <router-view/>
   </div>
 </template>
@@ -32,5 +32,8 @@ export default {
 }
 a.router-link-exact-active {
   color: #42b983;
+}
+a {
+  font-size: 2rem;
 }
 </style>

@@ -24,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'postId',
         as: 'commentPost'
       });
+      models.Post.hasMany(models.Like, {
+        allowNull:false,
+        foreignKey: 'postId',
+        as: 'postLike'
+      })
     }
   };
   Post.init({

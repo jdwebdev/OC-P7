@@ -32,6 +32,13 @@ exports.createComment = (req, res) => {
     const content = req.body.content;
     const userId = req.body.userId;
     const postId = req.body.postId;
+
+    console.log('req.body:')
+    console.log(req.body)
+
+    console.log(content);
+    console.log(userId);
+    console.log(postId);
     
     models.Comment.create({
         UserId: userId,

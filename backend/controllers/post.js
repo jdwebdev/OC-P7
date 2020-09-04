@@ -4,6 +4,7 @@ const ITEMS_LIMIT = 50;
 
 exports.createPost = (req, res, next) => {
     const userId = req.body.id;
+    console.log(userId);
     const content = req.body.content;
     const imageUrl = req.file ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}` : null;
     

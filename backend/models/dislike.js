@@ -23,16 +23,15 @@ module.exports = (sequelize, DataTypes) => {
       //   foreignKey: 'postId',
       //   otherKey: 'userId'
       // });
+      models.Dislike.belongsTo(models.User, {
+        foreignKey: 'userId',
+        // as: 'userLike'
+      });
 
-      // models.Dislike.belongsTo(models.User, {
-      //   foreignKey: 'userId',
-      //   as: 'userDislike'
-      // });
-
-      // models.Dislike.belongsTo(models.Post, {
-      //   foreignKey: 'postId',
-      //   as: 'postDislike'
-      // });
+      models.Dislike.belongsTo(models.Post, {
+        foreignKey: 'postId',
+        // as: 'postLike'
+      });
     }
   };
   Dislike.init({

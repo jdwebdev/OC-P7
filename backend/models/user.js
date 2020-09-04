@@ -21,11 +21,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userId',
         as: 'commentUser'
       });
-      // models.User.hasMany(models.Like, {
-      //   allowNull: false,
-      //   foreignKey: 'userId',
-      //   as: 'usersLike'
-      // });
+      models.User.hasMany(models.Like, {
+        allowNull: false,
+        foreignKey: 'userId',
+        as: 'usersLike'
+      });
     }
   };
   User.init({

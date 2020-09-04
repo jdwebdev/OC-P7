@@ -22,9 +22,6 @@ export default {
             password: ''
         }
     },
-    components: {
-        // Wall
-    },
     methods: {
         login() {
             const email = this.email

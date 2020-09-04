@@ -24,15 +24,15 @@ module.exports = (sequelize, DataTypes) => {
       //   otherKey: 'userId'
       // });
 
-      // models.Like.belongsTo(models.User, {
-      //   foreignKey: 'userId',
-      //   as: 'userLike'
-      // });
+      models.Like.belongsTo(models.User, {
+        foreignKey: 'userId',
+        // as: 'userLike'
+      });
 
-      // models.Like.belongsTo(models.Post, {
-      //   foreignKey: 'postId',
-      //   as: 'postLike'
-      // });
+      models.Like.belongsTo(models.Post, {
+        foreignKey: 'postId',
+        // as: 'postLike'
+      });
     }
   };
   Like.init({
