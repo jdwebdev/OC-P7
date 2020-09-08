@@ -3,11 +3,11 @@
         <h2>Formulaire d'inscription</h2>
         <form class="signupForm" action="">
             <label for="username">Nom d'utilisateur :</label>
-            <input v-model="username" type="text" id="username">
+            <input v-model="username" type="text" id="username" placeholder="Exemple: Supercodeur">
             <label for="email">Mail :</label>
-            <input v-model="email" type="email" id="email">
+            <input v-model="email" type="email" id="email" placeholder="exemple@mail.com">
             <label for="password">Mot de passe :</label>
-            <input v-model="password" type="password" id="password">
+            <input v-model="password" type="password" id="password" placeholder="Votre mot de passe">
             <button class="formBtn" @click="signup()">S'inscrire</button>
         </form>
     </div>

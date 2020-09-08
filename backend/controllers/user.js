@@ -78,13 +78,11 @@ exports.login = (req, res, next) => {
     })
     .then((user) => {
 
-        console.log('userCtrl : username :');
-        console.log(user.username);
         if (user) {
             bcrypt.compare(password, user.password)
                 .then( valid => {
                     if (!valid) {
-                        return res.status(401).json({ 'error': 'Mot de passe incorrect '});
+                        return res.status(401).json({ 'error': 'Mot de passe incorrect'});
                     } 
                     res.status(200).json({
                         userId: user.id,
@@ -122,6 +120,7 @@ exports.getMyProfile = (req, res) => {
 }
 
 exports.updateProfile = (req, res) => {
+
     models.User.findOne({
         attributes: ['id', 'username', 'imageUrl', 'aboutMe'],
         where: { id: req.body.id }
@@ -139,9 +138,7 @@ exports.updateProfile = (req, res) => {
         // Vérifier si le username a été modifié
         if (req.body.username && req.body.username !== user.username) {
 
-            console.log('a changé');
             if (req.body.username.length <= 3 || req.body.username.length >= 16) {
-                console.log('longueur !');
                 return res.status(400).json({ 'error': `Longueur du pseudo incorrecte, longueur acceptée : 4 à 15 caractères`});
             }
             
@@ -156,7 +153,7 @@ exports.updateProfile = (req, res) => {
                 } else {
                     updateUser(user, imgUrl, req.body, res);
                 }
-            })
+            }).catch(() => res.status(404).json({'Error': 'UserFound'}))
         } else {
             updateUser(user, imgUrl, req.body, res);
         }        
@@ -171,4 +168,24 @@ function updateUser(user, imgUrl, reqBody, res) {
     }).then(() => {
         return res.status(200).json({ message: 'Profil modifié avec succès' });
     }).catch(() => { res.status(400).json({ 'error': 'Impossible de modifier le profil' }) });
+}
+
+exports.deleteUser = (req, res) => {
+    
+    const userId = req.body.userId;
+
+    models.User.findOne({
+        where: { id: userId }
+    }).then((user) => {
+        if (user) {
+            if (user.imageUrl) {
+                const filename = user.imageUrl.split('/images/')[1];
+                fs.unlinkSync(`images/${filename}`);
+            }
+            user.destroy()
+            .then(() => {
+                res.status(200).json({'Ok:': 'Utilisateur supprimé avec succès'});
+            })
+        }
+    }).catch((e) => res.status(500).json({e}));
 }

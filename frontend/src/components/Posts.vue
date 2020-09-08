@@ -1,14 +1,24 @@
 <template>
     <div class="postSection">
-        <h3 class="postSection__username">{{ username }}</h3>
+        <div class="flex">
+            <img class="postSection__profileImg" :src="userImgUrl" />
+            <h3 class="postSection__username">{{ postUsername }}</h3>
+            
+            <!-- TODO :   || isAdmin = 1 !!!!  -->
+            <div v-if="username == postUsername" class="postSection__editDeleteBtns">
+                <div :class="`postSection__edit postEdit-${postId}`" @click="toggleModal()" title="Éditer le post"><i class="fas fa-edit"></i></div>
+                <div :class="`postSection__delete postDelete-${postId}`" @click="toggleDeletePanel()" title="Supprimer le post"><i class="fas fa-trash-alt"></i></div>
+            </div>
+        </div>
+        
         <p class="postSection__date">{{ dateFormat('date') }} : {{ dateFormat('time') }}</p>
+        
         <div class="separation"></div>
         <p class="postSection__content">{{ content }}</p>
         <img v-if="imageUrl" class="postSection__image" :src="imageUrl">
         <div class="likeDislike">
             <span :class="`thumbUp-${postId}`" @click="likeDislike($event)"><i class="far fa-thumbs-up"></i> {{ likes }}</span>
             <span :class="`thumbDown-${postId}`" @click="likeDislike($event)"><i class="far fa-thumbs-down"></i> {{ dislikes }}</span>
-            
         </div>
         
         <div class="commentSection">
@@ -19,23 +29,58 @@
             <Comments 
                 v-for="comment in comments"
                 :username="comment.User.username"
+                :currentUser="username"
                 :content="comment.content"
+                :imageUrl="comment.User.imageUrl"
+                :postId="postId"
+                :commentId="comment.id"
+                @refreshWallEvent="refreshWall"
                 :key="comment.id"
             />
         </div>
+        <Modal 
+            v-if="showModal"
+            @toggleModalEvent="toggleModal"
+            @refreshWallEvent="refreshWall"
+            :modalType="'post'"
+            :contentValue="content"
+            :imageUrl="imageUrl"
+            :postId="postId"
+        />
+        <Delete 
+            v-if="deletePanel" 
+            :panelType="'post'"
+            @closePanelEvent="toggleDeletePanel"
+            @refreshWallEvent="refreshWall"
+            :postId="postId"
+        />
     </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import Comments from '@/components/Comments'
+import Modal from '@/components/Modal'
+import Delete from './Delete.vue'
+
 
 export default {
     name: 'Posts',
+    data () {
+        return {
+            userImgUrl: '/user-icon.png',
+            showModal: false,
+            deletePanel: false
+        }
+    },
     props: {
-        username: {
+        postUsername: {
             type: String,
             required: true
+        },
+        userImg: {
+            type: String,
+            required: false
         },
         content: {
             type: String,
@@ -67,11 +112,14 @@ export default {
         }
     },
     components: {
-        Comments
+        Comments,
+        Modal,
+        Delete
     },
     computed: {
         ...mapState([
             'userId',
+            'username',
             'token'
         ])
     },
@@ -90,11 +138,6 @@ export default {
             const postId = this.postId
             let input = document.querySelector(`.com-${postId}`)
             const content = input.value
-
-            console.log(`userId: ${userId}`)
-            console.log(`postId: ${postId}`)
-            console.log(`content: ${content}`)
-
             const data = JSON.stringify({
                 content,
                 userId,
@@ -111,14 +154,12 @@ export default {
                 body: data
             }).then((response) => {
                 return response.json()
-            }).then((r) => {
-                console.log(r)
+            }).then(() => {
                 input.value = ''
-                this.$emit('refreshWallEvent')
+                this.refreshWall()
             }).catch((e) => console.log(e))
         },
         checkLikes() {
-            console.log('checklikes')
             if (this.likes > 0) {
                 
                 const userId = this.userId
@@ -133,13 +174,11 @@ export default {
                     return response.json()
                 }).then((r) => {
                     if (r.likeFound) {
-                        console.log('Like Trouvé !!!')
                         const thumb = document.querySelector(`.thumbUp-${postId}`)
                         thumb.style.color = 'green'
                         thumb.children[0].classList.remove('far')
                         thumb.children[0].classList.add('fas')
                     } else if (r.dislikeFound) {
-                        console.log('Dislike trouvé !!!')
                         const thumb = document.querySelector(`.thumbDown-${postId}`)
                         thumb.style.color = 'red'
                         thumb.children[0].classList.remove('far')
@@ -189,14 +228,11 @@ export default {
                     body: data
                 }).then((response) => {
                     return response.json()
-                }).then((r) => {
-                    console.log(r)
-                    this.$emit('refreshWallEvent')
+                }).then(() => {
+                    this.refreshWall()
                 }).catch((e) => console.log(e))
 
-            } else // Si le bouton est le bouton "dislike"
-            {
-
+            } else { // Si le bouton est le bouton "dislike"
                 const otherThumb = document.querySelector(`.thumbUp-${this.postId}`)
                 if (otherThumb.style.color == 'green') {
                     return console.log('Ne peut disliker pendant que l autre est actif')
@@ -231,16 +267,25 @@ export default {
                     body: data
                 }).then((response) => {
                     return response.json()
-                }).then((r) => {
-                    console.log(r)
-                    this.$emit('refreshWallEvent')
+                }).then(() => {
+                    this.refreshWall()
                 }).catch((e) => console.log(e))
-
-                // return console.log('stop function')
             }
+        },
+        refreshWall() {
+            this.$emit('refreshWallEvent')
+        },
+        toggleModal() {
+            this.showModal = !this.showModal
+        },
+        toggleDeletePanel() {
+            this.deletePanel = !this.deletePanel
         }
     },
     created() {
+        if (this.userImg) {
+            this.userImgUrl = this.userImg
+        }
         this.checkLikes()
     }
 }
@@ -255,6 +300,16 @@ export default {
         border-radius: 1rem;
         text-align: center;
     }
+    .flex {
+        display: flex;
+        align-items: flex-start;
+    }
+    .postSection__profileImg {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 1rem;
+    }
     .postSection__username {
         background-color: #aaa;
         width: 100px;
@@ -266,11 +321,31 @@ export default {
     .postSection__date {
         text-align: left;
     }
+    .postSection__editDeleteBtns {
+        font-size: 1.5rem;
+        color: #444;
+        flex:2;
+    }
+    .postSection__edit, .postSection__delete {
+        display: inline-block;
+        position: relative;
+        margin-right: 1rem;
+        left: 40%;
+        cursor: pointer;
+    }
+    .postSection__edit:hover {
+        color: blue;
+    }
+    .postSection__delete:hover {
+        color:red;
+    }
+
     .postSection__content {
         font-size: 1rem;
         text-align: left;
         margin: 0.5rem 0 0.5rem 0;
     }
+    
     .postSection__image {
         margin: 1rem auto;
         width: 70%;
@@ -299,6 +374,7 @@ export default {
         background-color: #777;
         padding: 0.5rem;
         margin-top: 1rem;
+        border-radius: 0 0 1rem 1rem
     }
     .commentSection label {
         display: block;
@@ -315,6 +391,7 @@ export default {
 
     .commentBtn {
         padding: 0.5rem;
+        margin: 1rem;
         cursor: pointer;
     }
 

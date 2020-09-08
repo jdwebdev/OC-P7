@@ -13,7 +13,8 @@
 
         <Posts 
             v-for="post in posts" 
-            :username="post.User.username"
+            :postUsername="post.User.username"
+            :userImg="post.User.imageUrl"
             :content="post.content"
             :imageUrl="post.imageUrl"
             :likes="post.likes"
@@ -67,8 +68,7 @@ export default {
                 body: formData
             }).then((response) => {
                 return response.json()
-            }).then((r) => {
-                console.log(r)
+            }).then(() => {
                 input.value = ''
                 imgInput.value = null
                 this.getAllPosts()
@@ -76,6 +76,9 @@ export default {
         },
 
         getAllPosts() {
+
+            console.log('getAllPOSTS')
+
             fetch('http://localhost:3000/api/post', {
                 method: 'GET',
                 headers: {
@@ -110,6 +113,8 @@ export default {
         background-color: #aaa;
         width: 60vw;
         margin: 0 auto;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
     .wall label {
         font-size: 1rem;

@@ -3,9 +3,10 @@
         <h2>Déjà inscrit ? Connectez-vous :</h2>
         <form class="loginForm" action="">
             <label for="email">Mail</label>
-            <input v-model="email" type="email" id="email">
+            <input v-model="email" type="email" id="email" placeholder="exemple@mail.com">
             <label for="password">Mot de passe</label>
-            <input v-model="password" type="password" id="password">
+            <input v-model="password" type="password" id="password" placeholder="Votre mot de passe">
+            <span v-if="displayWrongPassword" class="wrongPassword">Mot de passe incorrect</span>
             <button class="formBtn" @click="login()">Se connecter</button>
         </form>
     </div>
@@ -19,7 +20,8 @@ export default {
     data() {
         return {
             email: '',
-            password: ''
+            password: '',
+            displayWrongPassword: false
         }
     },
     methods: {
@@ -42,7 +44,12 @@ export default {
             }).then((response) => {
                 return response.json()
             }).then((user) => {
-                this.saveUser(user)
+                if (!user.error) {
+                    this.saveUser(user)
+                } else if (user.error == 'Mot de passe incorrect'){
+                    this.displayWrongPassword = true;
+                }
+                
             }).catch((e) => console.log(e))
         },
         saveUser(user){
@@ -73,5 +80,10 @@ export default {
     .loginForm input {
         padding: 0.2rem;
         margin-bottom: 0.5rem;
+    }
+
+    .wrongPassword {
+        color: red;
+
     }
 </style>

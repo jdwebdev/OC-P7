@@ -1,10 +1,11 @@
 const models = require('../models');
+const fs = require('fs');
+
 
 const ITEMS_LIMIT = 50;
 
 exports.createPost = (req, res, next) => {
     const userId = req.body.id;
-    console.log(userId);
     const content = req.body.content;
     const imageUrl = req.file ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}` : null;
     
@@ -36,11 +37,6 @@ exports.getPosts = (req, res, next) => {
     const offset = parseInt(req.query.offset);
     const order = req.query.order;
 
-    console.log(fields);
-    console.log(limit);
-    console.log(offset);
-    console.log(order);
-
     if (limit > ITEMS_LIMIT) {
         limit = ITEMS_LIMIT;
     }
@@ -52,7 +48,7 @@ exports.getPosts = (req, res, next) => {
         offset: (!isNaN(offset)) ? offset : null,
         include: [{
             model: models.User,
-            attributes: [ 'username' ],
+            attributes: [ 'username', 'imageUrl' ],
         },
         {
             model: models.Comment,
@@ -60,7 +56,7 @@ exports.getPosts = (req, res, next) => {
             attributes: [ 'id', 'content' ],
             include: {
                 model: models.User,
-                attributes: [ 'username' ]
+                attributes: [ 'username', 'imageUrl' ]
             }
         }]
     }).then((posts) => {
@@ -70,7 +66,57 @@ exports.getPosts = (req, res, next) => {
             res.status(404).json({ 'error': 'no posts found'});
         }
     }).catch((e) => {
-        console.log(e);
         return res.status(500).json({ 'error': 'invalid fields'});
     });
 };
+
+
+exports.updatePost = (req, res) => {
+
+    const postId = req.body.id;
+    const postContent = req.body.content;
+    
+    models.Post.findOne({
+        attributes: ['id', 'content', 'imageUrl'],
+        where: { id: postId }
+    }).then((post) => {
+        
+        let imgUrl = null; 
+        if (req.file) {
+            if (post.imageUrl) {
+                const filename = post.imageUrl.split('/images/')[1];
+                fs.unlinkSync(`images/${filename}`);
+            }
+            imgUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+        }
+        
+        post.update({
+            content: postContent,
+            imageUrl: (imgUrl ? imgUrl : post.imageUrl),
+            id: post.id
+        }).then(() => {
+            return res.status(200).json({ message: 'Post modifié avec succès' });
+        }).catch(() => { res.status(400).json({ 'error': 'Impossible de modifier le post' }) });
+
+    }).catch((e) => res.status(400).json({ 'error': 'Post introuvable' }));
+}
+
+exports.deletePost = (req, res) => {
+
+    const postId = req.body.postId;
+
+    models.Post.findOne({
+        where: { id: postId }
+    }).then((post) => {
+        if (post) {
+            if (post.imageUrl) {
+                const filename = post.imageUrl.split('/images/')[1];
+                fs.unlinkSync(`images/${filename}`);
+            }
+            post.destroy()
+            .then(() => {
+                res.status(200).json({'Ok:': 'Post supprimé avec succès'});
+            })
+        }
+    }).catch((e) => res.status(500).json({e}));
+}
