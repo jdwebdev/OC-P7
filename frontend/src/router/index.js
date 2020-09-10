@@ -18,9 +18,10 @@ Vue.use(VueRouter)
     component: Wall
   },
   {
-    path: '/profile',
+    path: '/profile/:id',
     name: 'Profile',
-    component: Profile
+    component: Profile,
+    props: true
   }
 
   // {

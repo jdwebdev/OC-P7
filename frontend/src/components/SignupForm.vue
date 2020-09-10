@@ -1,14 +1,14 @@
 <template>
     <div class="signupDiv">
         <h2>Formulaire d'inscription</h2>
-        <form class="signupForm" action="">
-            <label for="username">Nom d'utilisateur :</label>
+        <form class="signupForm">
+            <label for="username">Nom d'utilisateur : <span class="infos">(entre 4 et 10 caractères)</span></label>
             <input v-model="username" type="text" id="username" placeholder="Exemple: Supercodeur">
             <label for="email">Mail :</label>
             <input v-model="email" type="email" id="email" placeholder="exemple@mail.com">
-            <label for="password">Mot de passe :</label>
+            <label for="password">Mot de passe : <span class="infos">(entre 4 et 8 lettres sans caractère spécial, incluant au minimum un chiffre)</span></label>
             <input v-model="password" type="password" id="password" placeholder="Votre mot de passe">
-            <button class="formBtn" @click="signup()">S'inscrire</button>
+            <button class="formBtn" @click="signup($event)">S'inscrire</button>
         </form>
     </div>
 </template>
@@ -24,7 +24,10 @@ export default {
         }
     },
     methods: {
-        signup() {
+        signup(e) {
+
+            e.preventDefault()
+            
             const username = this.username
             const email = this.email
             const password = this.password
@@ -44,9 +47,12 @@ export default {
                 body: signupData
             }).then((response) => {
                 return response.json()
-            }).then((r) => {
-                console.log(r)
+            }).then(() => {
+                this.toLoginForm()
             }).catch((e) => console.log(e))
+        },
+        toLoginForm() {
+            this.$emit('toggleEvent')
         }
     }
 }
@@ -72,11 +78,23 @@ export default {
     .signupForm input {
         padding: 0.2rem;
         margin-bottom: 0.5rem;
+        height: 2.5rem;
+    }
+    .infos {
+        font-size: 0.7rem;
+        color: gray;
     }
 
     .formBtn {
         margin-top: 1rem;
         padding: 0.5rem;
         cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+
+        .signupDiv {
+            width: 90vw;
+        }
     }
 </style>

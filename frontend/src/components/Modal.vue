@@ -5,10 +5,12 @@
             <form class="modal__form">
                 <label for="contentArea">Modifier le contenu : </label>
                 <textarea :class="`content-${postId}`" id="contentArea" type="text" :value="contentValue" />
-                <div v-if="modalType == 'post'">
-                    <label>Image actuelle : </label>
-                    <img class="modal__img" :src="imageUrl" />
-                    <label for="modal__insertImg">Modifier l'image : </label>
+                <div class="modal__imgContainer" v-if="modalType == 'post'">
+                    <label v-if="imageUrl">Image actuelle : </label>
+                    <img v-if="imageUrl" class="modal__img" :src="imageUrl" />
+                    <p class="modal__imgError" v-if="imgFormatError">Mauvais format ! Formats acceptés jpg, jpeg, ou png</p>
+                    <label v-if="imageUrl" for="modal__insertImg">Modifier l'image : </label>
+                    <label v-if="!imageUrl" for="modal__insertImg">Ajouter une image : </label>
                     <input class="modal__insertFile" id="modal__insertImg" type="file" />
                 </div>
                 <div class="modal__btns">
@@ -25,6 +27,11 @@ import { mapState } from 'vuex'
 
 export default {
     Name: 'Modal',
+    data () {
+        return {
+            imgFormatError: false
+        }
+    },
     props: {
         modalType: {
             type: String,
@@ -61,6 +68,15 @@ export default {
                 const id = this.postId
                 const content = contentInput.value
                 const file = imgInput.files[0]
+
+                if (file) {
+                    if (file.type != 'image/jpeg' && file.type != 'image/png') {
+                        this.imgFormatError = true
+                        return console.log('erreur de format !!')
+                    } else {
+                        this.imgFormatError = false
+                    }
+                }
 
                 // Si au clic, il n'y a pas de nouvelles images et que le contenu n'a pas changé, on ferme juste le modal
                 if (!imgInput.files[0] && content == this.contentValue) {
@@ -106,9 +122,7 @@ export default {
                         body: data
                     }).then((response) => {
                         return response.json()
-                    }).then((r) => {
-                        console.log(r)
-                        console.log('req fini')
+                    }).then(() => {
                         this.$emit('toggleModalEvent')
                         this.$emit('refreshWallEvent')
                     }).catch(() => console.log('error avec FETCH ?'))
@@ -133,6 +147,10 @@ export default {
         width: 100%;
         height: 100%;
         background-color: rgba(50,50,50, 0.5);
+
+        display:flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .modal__form {
@@ -156,11 +174,22 @@ export default {
         margin-bottom: 1rem;
     }
 
+    .modal__imgContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     .modal__img {
         width: 30%;
         margin-bottom: 0.5rem;
         border: 1px solid black;
         border-radius: 1rem;
+    }
+
+    .modal__imgError {
+        color: red;
+        font-size: 1rem;
     }
 
     .modal__btns {
@@ -176,5 +205,15 @@ export default {
         border: none;
         width: 5rem;
         cursor: pointer;
+    }
+    @media screen and (max-width: 768px) {
+
+        .modal__content {
+            width: 95%;
+        }
+        #contentArea {
+            min-width: 100%;
+            max-width:100%;
+        }
     }
 </style>

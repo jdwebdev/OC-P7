@@ -4,6 +4,7 @@
         <input id="username" type="text" :value="`${username}`" />
 
         <label for="profileImg">Image de profil :</label>
+        <p class="imgError" v-if="imgFormatError">Mauvais format ! Formats acceptés jpg, jpeg, ou png</p>
         <input id="profileImg" type="file" />
 
         <label for="aboutMe">À propos de moi :</label>
@@ -17,6 +18,11 @@
 
 export default {
     name: 'ProfileForm',
+    data () {
+        return {
+            imgFormatError: false
+        }
+    },
     props: {
         userId: {
             type: Number,
@@ -48,6 +54,15 @@ export default {
             const file = imgInput.files[0]
             const aboutMe = aboutInput.value
 
+            if (file) {
+                if (file.type != 'image/jpeg' && file.type != 'image/png') {
+                    this.imgFormatError = true
+                    return console.log('erreur de format !!')
+                } else {
+                    this.imgFormatError = false
+                }
+            }
+            
             const formData  = new FormData()
             formData.append('id', id)
             formData.append('username', username)
@@ -91,9 +106,12 @@ export default {
     .profileForm input {
         width: 60%;
         margin: 0 auto;
+        padding: 0.5rem;
+        height: 2rem;
     }
-    #profileImg {
-        
+
+    .imgError {
+        color: red;
     }
 
     #aboutMe {
@@ -101,6 +119,7 @@ export default {
         max-width: 60%;
         margin: 0 auto;
         padding: 0.5rem;
+        height: 5rem;
     }
 
     .profileForm__btn {
@@ -112,5 +131,19 @@ export default {
     }
     .profileForm__btn:hover {
         cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+        .profileForm input {
+            width: 100%;
+            
+        }
+        #aboutMe {
+            min-width: 100%;
+            max-width: 100%;
+        }
+        .profileForm__btn {
+            width: 150px;
+        }
     }
 </style>

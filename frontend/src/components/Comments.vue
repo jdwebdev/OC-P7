@@ -2,11 +2,9 @@
     <div class="singleComment">
         <div class="singleComment__userInfo">
             <img class="singleComment__profileImg" :src="userImgUrl" />
-            <h3 class="singleComment__username">{{ username }}</h3>
+            <h3 class="singleComment__username"><router-link class="singleComment__router" :to="`/Profile/${commentUserId}`" >{{ username }}</router-link></h3>
         </div>
-
-        <!-- TODO :   || isAdmin = 1 !!!!  -->
-        <div v-if="username == currentUser" class="singleComment__editDeleteBtns">
+        <div v-if="username == currentUser || isAdmin == 1" class="singleComment__editDeleteBtns">
             <div class="singleComment__edit" @click="toggleModal()" title="Éditer le commentaire"><i class="fas fa-edit"></i></div>
             <div class="singleComment__delete" @click="toggleDeletePanel()" title="Supprimer le commentaire"><i class="fas fa-trash-alt"></i></div>
         </div>
@@ -33,6 +31,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Modal from './Modal.vue'
 import Delete from './Delete.vue'
 
@@ -50,6 +49,10 @@ export default {
         Delete
     },
     props: {
+        commentUserId: {
+            type: Number,
+            required: true
+        },
         username: {
             type: String,
             required: true
@@ -86,6 +89,11 @@ export default {
             this.deletePanel = !this.deletePanel
         }
     },
+    computed: {
+        ...mapState([
+            'isAdmin'
+        ])
+    },
     created () {
         if (this.imageUrl) {
             this.userImgUrl = this.imageUrl
@@ -109,18 +117,24 @@ export default {
         display: flex;
         flex-direction: row;
         align-items: center;
+        margin-bottom: 0.5rem;
     }
 
     .singleComment__profileImg {
         width: 30px;
         height: 30px;
-        margin-bottom: 0.5rem;
         border-radius: 50%;
         margin-right: 1rem;
     }
     
     .singleComment__username {
         font-size: 1rem;
+    }
+
+    .singleComment__router {
+        text-decoration: none;
+        font-size: 0.9rem;
+        color: black;
     }
 
     .singleComment__editDeleteBtns {
@@ -146,5 +160,16 @@ export default {
     }
     .singleComment__content {
         font-size: 1rem;
+    }
+
+    @media screen and (max-width: 768px) {
+
+        .singleComment__editDeleteBtns {
+            font-size: 1.2rem;
+        }
+        .singleComment__content {
+            font-size:0.8rem;
+        }
+
     }
 </style>

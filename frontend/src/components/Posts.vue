@@ -1,11 +1,9 @@
 <template>
     <div class="postSection">
-        <div class="flex">
+        <div class="postSection__header">
             <img class="postSection__profileImg" :src="userImgUrl" />
-            <h3 class="postSection__username">{{ postUsername }}</h3>
-            
-            <!-- TODO :   || isAdmin = 1 !!!!  -->
-            <div v-if="username == postUsername" class="postSection__editDeleteBtns">
+            <h3 class="postSection__username"><router-link class="postSection__router" :to="`/Profile/${postUserId}`" title="Voir le profil">{{ postUsername }} Id: {{ postId }}</router-link></h3>
+            <div v-if="username == postUsername || isAdmin == 1" class="postSection__editDeleteBtns">
                 <div :class="`postSection__edit postEdit-${postId}`" @click="toggleModal()" title="Éditer le post"><i class="fas fa-edit"></i></div>
                 <div :class="`postSection__delete postDelete-${postId}`" @click="toggleDeletePanel()" title="Supprimer le post"><i class="fas fa-trash-alt"></i></div>
             </div>
@@ -25,9 +23,10 @@
             <label for="commentInput">Ajouter un commentaire: </label>
             <textarea :class="`com-${postId}`" id="commentInput" type="text" />
             <button class="commentBtn" @click="submitComment($event)">Envoyer</button>
-            <p class="comments">Commentaires :</p>
+            <p class="comments" v-if="comments[0]">Commentaires :</p>
             <Comments 
                 v-for="comment in comments"
+                :commentUserId="comment.User.id"
                 :username="comment.User.username"
                 :currentUser="username"
                 :content="comment.content"
@@ -74,6 +73,10 @@ export default {
         }
     },
     props: {
+        postUserId: {
+            type: Number,
+            required: true
+        },
         postUsername: {
             type: String,
             required: true
@@ -120,13 +123,19 @@ export default {
         ...mapState([
             'userId',
             'username',
-            'token'
+            'token',
+            'isAdmin'
         ])
+        
     },
     methods: {
         dateFormat(format) {
             if (format === 'date') {
-                return this.createdAt.split('T')[0]
+                const engFormat = this.createdAt.split('T')[0]
+                const year = engFormat.split('-')[0]
+                const month = engFormat.split('-')[1]
+                const day = engFormat.split('-')[2]
+                return `${day}-${month}-${year}`
             } else if (format === 'time') {
                 const time = this.createdAt.split('T')[1]
                 return time.split('.')[0]
@@ -300,7 +309,8 @@ export default {
         border-radius: 1rem;
         text-align: center;
     }
-    .flex {
+    .postSection__header {
+        position: relative;
         display: flex;
         align-items: flex-start;
     }
@@ -312,20 +322,28 @@ export default {
     }
     .postSection__username {
         background-color: #aaa;
-        width: 100px;
         border-radius: 1rem;
         text-align: center;
-        padding: 0.5rem;
+        padding: 0.5rem 0.7rem;
+        
         margin-bottom: 0.5rem;
     }
+    .postSection__router {
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
     .postSection__date {
         text-align: left;
     }
     .postSection__editDeleteBtns {
         font-size: 1.5rem;
         color: #444;
-        flex:2;
+        position: absolute;
+        right: 30px;
+        top: 5px;
     }
+    
     .postSection__edit, .postSection__delete {
         display: inline-block;
         position: relative;
@@ -333,6 +351,8 @@ export default {
         left: 40%;
         cursor: pointer;
     }
+    
+
     .postSection__edit:hover {
         color: blue;
     }
@@ -350,9 +370,8 @@ export default {
         margin: 1rem auto;
         width: 70%;
         background-color: #fff;
-        padding: 1rem;
-        border: 2px solid black;
         border-radius: 0.5rem;
+        box-shadow: 0px 0px 10px black;
     }
     .separation {
         height: 2px;
@@ -392,6 +411,8 @@ export default {
     .commentBtn {
         padding: 0.5rem;
         margin: 1rem;
+        border: none;
+        border-radius: 0.5rem;
         cursor: pointer;
     }
 
@@ -399,5 +420,28 @@ export default {
         color: #fff;
         font-size: 1rem;
         text-align: left;
+    }
+
+    @media screen and (max-width: 768px) {
+        .postSection {
+            width: 95%;
+        }
+        .postSection__editDeleteBtns {
+            font-size: 1.2rem;
+            right: 20px;
+        }
+
+        .postSection__image {
+            padding: 0;
+            width: 100%;
+        }
+        .likeDislike {
+            font-size: 1.5rem;
+        }
+
+        .commentSection textarea {
+            min-width: 100%;
+            max-width: 100%;
+        }
     }
 </style>

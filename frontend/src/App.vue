@@ -1,18 +1,55 @@
 <template>
   <div id="app">
       <Header />
-      <router-link to="/">Home</router-link>
-      <router-link to="/Profile">Profil</router-link>
+      <!-- <router-link to="/">Home</router-link> -->
       <router-view/>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Header from '@/components/Header.vue'
+import router from '@/router/index.js'
+
+import VueJwtDecode from 'vue-jwt-decode'
+
 
 export default {
   components: {
     Header
+  },
+  methods: {
+    checkLocalStorage() {
+      if (window.localStorage.getItem('token')) {
+        
+        const tokenFromLocal = window.localStorage.getItem('token')
+        const user = VueJwtDecode.decode(tokenFromLocal)
+        user.token = tokenFromLocal
+        user.isAdmin ? user.isAdmin = 1 : user.isAdmin = 0
+
+        this.$store.commit('SAVE_USER', user)
+      
+        if (this.$router.currentRoute.path != '/Wall') {
+          router.push('/Wall')
+        }
+        
+      } else {
+        if (this.$router.currentRoute.path != '/') {
+          router.push('/')
+        }
+      }
+    }
+  },
+  computed: {
+    ...mapState([
+        'userId',
+        'username',
+        'token',
+        'isAdmin'
+    ])
+  },
+  created() {
+    this.checkLocalStorage()
   }
 }
 </script>

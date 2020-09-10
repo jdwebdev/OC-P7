@@ -1,10 +1,13 @@
 <template>
     <div class="wall">
-        <h2>Bienvenue {{ username }}</h2>
+        <h2>Bienvenue {{ username }}<span v-if="isAdmin == 1"> ADMIN</span></h2>
+        <router-link class="wall__router" :to="`/Profile/${userId}`">Mon profil</router-link>
+        <button class="wall__logout" @click="logout($event)">Se déconnecter</button>
         <form v-if="requestOk" class="post__form">
             <label for="post">Postez ce que vous voulez :)</label>
             <textarea id="post" type="text" />
             <div class="postBtns">
+                <p class="wall__imgError" v-if="imgFormatError">Mauvais format ! Formats acceptés jpg, jpeg, png ou gif</p>
                 <label for="insertImg">Insérer une image :</label>
                 <input class="insertFile" id="insertImg" type="file" />
                 <button class="postBtn" @click="submitPost($event)">Poster</button>     
@@ -13,6 +16,7 @@
 
         <Posts 
             v-for="post in posts" 
+            :postUserId="post.User.id"
             :postUsername="post.User.username"
             :userImg="post.User.imageUrl"
             :content="post.content"
@@ -32,27 +36,52 @@
 <script>
 import { mapState } from 'vuex'
 import Posts from '@/components/Posts.vue'
+import router from '@/router/index.js'
 
 export default {
     name: 'Wall',
     data () {
         return {
             posts: null,
-            requestOk: false
+            requestOk: false,
+            imgFormatError: false
         }
     },
     components: {
         Posts
     },
     methods: {
+        logout(e) {
+            e.preventDefault()
+            window.localStorage.removeItem('token')
+            const user = {
+                userId: 0,
+                username:'',
+                token: '',
+                isAdmin: 0
+            }
+            this.$store.commit('SAVE_USER', user)
+
+            router.push('/')
+        },
         submitPost(e) {
-            e.preventDefault();
+            e.preventDefault()
             const id = this.userId
             let input = document.getElementById('post')
             let imgInput = document.getElementById('insertImg')
             
             const content = input.value
             const file = imgInput.files[0]
+
+            if (file) {
+                if (file.type && file.type != 'image/jpeg' && file.type != 'image/png' && file.type != 'image/gif') {
+                    this.imgFormatError = true
+                    return console.log('erreur de format !!')
+                } else {
+                    this.imgFormatError = false
+                }
+            }
+            
 
             const formData = new FormData()
             formData.append('id', id)
@@ -77,8 +106,6 @@ export default {
 
         getAllPosts() {
 
-            console.log('getAllPOSTS')
-
             fetch('http://localhost:3000/api/post', {
                 method: 'GET',
                 headers: {
@@ -99,7 +126,8 @@ export default {
         ...mapState([
             'userId',
             'username',
-            'token'
+            'token',
+            'isAdmin'
         ])
     },
     created () {
@@ -112,13 +140,41 @@ export default {
     .wall {
         background-color: #aaa;
         width: 60vw;
-        margin: 0 auto;
+        margin: 1rem auto;
         padding-top: 1rem;
         padding-bottom: 1rem;
+        text-align: center;
     }
     .wall label {
         font-size: 1rem;
         margin: 0.5rem auto;
+    }
+
+    .wall__logout {
+        padding: 0.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        background-color: #fd502c;
+        margin-left: 1rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+    }
+
+    .wall__router {
+        font-size: 0.8rem;
+        text-decoration: none;
+        background-color: #fff;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        color: black;
+    }
+
+    .wall__imgError {
+        color: red;
+        font-size: 1rem;
     }
 
     .post__form {
@@ -137,6 +193,7 @@ export default {
     .postBtns {
         background-color: #777;
         width: 80%;
+        padding: 1rem;
     }
     .postBtns label {
         font-size: 0.8rem;
@@ -153,5 +210,29 @@ export default {
         width: 300px;
         margin-right: 1rem;
         cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+        .wall {
+            width: 95vw;
+        }
+        .post__form {
+            width: 100%;
+        }
+        .post__form textarea {
+            min-width: 95%;
+            max-width: 95%;
+        }
+        .postBtns {
+            width: 95%;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .insertFile {
+            width: 90%;
+            margin: 0;
+        }
     }
 </style>

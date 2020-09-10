@@ -48,7 +48,7 @@ exports.getPosts = (req, res, next) => {
         offset: (!isNaN(offset)) ? offset : null,
         include: [{
             model: models.User,
-            attributes: [ 'username', 'imageUrl' ],
+            attributes: [ 'id', 'username', 'imageUrl' ],
         },
         {
             model: models.Comment,
@@ -56,7 +56,7 @@ exports.getPosts = (req, res, next) => {
             attributes: [ 'id', 'content' ],
             include: {
                 model: models.User,
-                attributes: [ 'username', 'imageUrl' ]
+                attributes: [ 'id', 'username', 'imageUrl' ]
             }
         }]
     }).then((posts) => {

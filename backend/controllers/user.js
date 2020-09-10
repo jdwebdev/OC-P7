@@ -20,8 +20,8 @@ exports.signup = (req, res, next) => {
         return res.status(400).json({ 'error': 'Paramètres manquants' });
     }
 
-    if (username.length <= 3 || username.length >= 16) {
-        return res.status(400).json({ 'error': `Longueur du pseudo incorrecte, longueur acceptée : 4 à 15 caractères`});
+    if (username.length <= 3 || username.length >= 11) {
+        return res.status(400).json({ 'error': `Longueur du pseudo incorrecte, longueur acceptée : 4 à 10 caractères`});
     }
     
     if (!EMAIL_REGEX.test(email)) {
@@ -89,11 +89,13 @@ exports.login = (req, res, next) => {
                         username: user.username,
                         token: jwt.sign({ 
                                 userId: user.id,
+                                username: user.username,
                                 isAdmin: user.isAdmin 
                             },
                             process.env.SECRET_TOKEN,
                             { expiresIn: "1h" }
-                        )
+                        ),
+                        isAdmin: user.isAdmin
                     })
                 })
         } else {
@@ -106,6 +108,20 @@ exports.login = (req, res, next) => {
 }
 
 exports.getMyProfile = (req, res) => {
+    
+    models.User.findOne({
+        attributes: ['id', 'username', 'email', 'imageUrl', 'aboutMe'],
+        where: { id: req.params.id }
+    }).then((user) => {
+        if (user) {
+            res.status(201).json(user);
+        } else {
+            res.status(404).json({ 'error': 'Utilisateur introuvable' });
+        }
+    }).catch(() => res.status(500).json({ 'error': 'cannot fetch user' }));
+}
+
+exports.getProfile = (req, res) => {
     
     models.User.findOne({
         attributes: ['id', 'username', 'email', 'imageUrl', 'aboutMe'],

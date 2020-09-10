@@ -6,10 +6,15 @@
         <li><button class="logBtns" @click="toggleForm('login')">Connexion</button></li>
       </ul>
     </nav>
-    <SignupForm v-if="!toggleLog"/>
+    <SignupForm 
+      v-if="!toggleLog"
+      @toggleEvent="toggleForm"
+    />
     <LoginForm 
       v-if="toggleLog" 
-      :userId="userId" />
+      :userId="userId"
+      :firstLogin="firstLogin"
+    />
   </div>
 </template>
 
@@ -27,7 +32,8 @@ export default {
   },
   data() {
     return {
-      toggleLog: false
+      toggleLog: true,
+      firstLogin: false
     }
   },
   methods: {
@@ -35,6 +41,10 @@ export default {
       if (btnType === 'signup' && this.toggleLog) {
         this.toggleLog = false
       } else if (btnType === 'login' && !this.toggleLog) {
+        this.firstLogin = false
+        this.toggleLog = true
+      } else if (!btnType) {
+        this.firstLogin = true
         this.toggleLog = true
       }
     }
@@ -68,6 +78,12 @@ export default {
   }
   .logBtns:hover {
     cursor: pointer;
+  }
+
+  @media screen and (max-width: 768px) {
+    .navBtn ul{
+      justify-content: center;
+    }
   }
   
 </style>
