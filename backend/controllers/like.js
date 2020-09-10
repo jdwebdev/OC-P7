@@ -25,6 +25,31 @@ exports.getLike = (req, res) => {
     .catch(() => res.status(404).json({ 'Error': 'Avis introuvables' })) 
 }
 
+exports.getDislike = (req, res) => {
+    const postId = req.params.postId;
+    const userId = req.params.userId;
+
+    models.Dislike.findOne({
+        where: {
+            postId: postId,
+            userId: userId
+        }
+    })
+    .then( dislikeFound => {
+        models.Like.findOne({
+            where: {
+                postId: postId,
+                userId: userId
+            }
+        })
+        .then( likeFound => {
+            return res.status(200).json({ likeFound, dislikeFound });
+        })
+        .catch(() => res.status(404).json({ 'Error': 'Avis introuvables' })) 
+    })
+    .catch(() => res.status(404).json({ 'Error': 'Avis introuvables' })) 
+}
+
 exports.likePost = (req,res) => {
     const postId = req.body.postId;
     const userId = req.body.userId; 

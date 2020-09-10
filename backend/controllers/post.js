@@ -1,7 +1,6 @@
 const models = require('../models');
 const fs = require('fs');
 
-
 const ITEMS_LIMIT = 50;
 
 exports.createPost = (req, res, next) => {

@@ -170,7 +170,6 @@ export default {
         },
         checkLikes() {
             if (this.likes > 0) {
-                
                 const userId = this.userId
                 const postId = this.postId
 
@@ -182,17 +181,26 @@ export default {
                 }).then((response) => {
                     return response.json()
                 }).then((r) => {
-                    if (r.likeFound) {
-                        const thumb = document.querySelector(`.thumbUp-${postId}`)
-                        thumb.style.color = 'green'
-                        thumb.children[0].classList.remove('far')
-                        thumb.children[0].classList.add('fas')
-                    } else if (r.dislikeFound) {
-                        const thumb = document.querySelector(`.thumbDown-${postId}`)
-                        thumb.style.color = 'red'
-                        thumb.children[0].classList.remove('far')
-                        thumb.children[0].classList.add('fas')
+
+                    this.changeIconColor(r, postId)
+
+                }).catch((e) => console.log(e))
+            }
+            if (this.dislikes > 0) {
+                const userId = this.userId
+                const postId = this.postId
+
+                fetch(`http://localhost:3000/api/post/dislike/${userId}/${postId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`
                     }
+                }).then((response) => {
+                    return response.json()
+                }).then((r) => {
+
+                    this.changeIconColor(r, postId)
+                    
                 }).catch((e) => console.log(e))
             }
         },
@@ -289,6 +297,19 @@ export default {
         },
         toggleDeletePanel() {
             this.deletePanel = !this.deletePanel
+        },
+        changeIconColor(res, postId) {
+            if (res.likeFound) {
+                const thumb = document.querySelector(`.thumbUp-${postId}`)
+                thumb.style.color = 'green'
+                thumb.children[0].classList.remove('far')
+                thumb.children[0].classList.add('fas')
+            } else if (res.dislikeFound) {
+                const thumb = document.querySelector(`.thumbDown-${postId}`)
+                thumb.style.color = 'red'
+                thumb.children[0].classList.remove('far')
+                thumb.children[0].classList.add('fas')
+            }
         }
     },
     created() {

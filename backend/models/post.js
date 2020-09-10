@@ -28,7 +28,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull:false,
         foreignKey: 'postId',
         as: 'postLike'
-      })
+      });
+      models.Post.hasMany(models.Dislike, {
+        allowNull:false,
+        foreignKey: 'postId',
+        as: 'postDislike'
+      });
     }
   };
   Post.init({

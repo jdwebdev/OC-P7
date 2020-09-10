@@ -190,17 +190,85 @@ exports.deleteUser = (req, res) => {
     
     const userId = req.body.userId;
 
+    // Trouver l'utilisateur à supprimer
     models.User.findOne({
         where: { id: userId }
     }).then((user) => {
         if (user) {
-            if (user.imageUrl) {
-                const filename = user.imageUrl.split('/images/')[1];
-                fs.unlinkSync(`images/${filename}`);
-            }
-            user.destroy()
-            .then(() => {
-                res.status(200).json({'Ok:': 'Utilisateur supprimé avec succès'});
+
+            // Supprimer les images de ses différents posts
+            models.Post.findAll({
+                where: {
+                    userId: user.id
+                }
+            }).then((posts) => {
+                if (posts) {
+                    posts.forEach( post => {
+                        if (post.imageUrl) {
+                            const filename = post.imageUrl.split('/images/')[1];
+                            fs.unlinkSync(`images/${filename}`);
+                        }
+                    })
+                }
+
+                // Décrémenter ses likes des posts
+                models.Post.findAll({
+                    attributes : ['id'],
+                    include: [{
+                        model: models.Like,
+                        as: 'postLike',
+                        attributes: [ 'userId', 'postId' ],
+                        where: {
+                            userId: user.id
+                        }
+                    }]
+                })
+                .then( likedPosts => {
+                    if (likedPosts) {
+                        likedPosts.forEach( post => {
+                            post.decrement('likes')
+                            .then(() => {
+                                console.log('decrement')
+                            })
+                        })
+                    }
+
+                    // Décrémenter ses dislikes des posts
+                    models.Post.findAll({
+                        attributes : ['id'],
+                        include: [{
+                            model: models.Dislike,
+                            as: 'postDislike',
+                            attributes: [ 'userId', 'postId' ],
+                            where: {
+                                userId: user.id
+                            }
+                        }]
+                    })
+                    .then( dislikedPosts => {
+                        if (dislikedPosts) {
+                            dislikedPosts.forEach( post => {
+                                post.decrement('dislikes')
+                                .then(() => {
+                                    console.log('decrement')
+                                })
+                            })
+                        }
+                    })
+                })
+
+                // Supprimer son image utilisateur
+                if (user.imageUrl) {
+                    const filename = user.imageUrl.split('/images/')[1];
+                    fs.unlinkSync(`images/${filename}`);
+                }
+
+                // Destruire l'utilisateur, réaction en cascade qui détruit tous ses posts, commentaires et likes/dislikes
+                user.destroy()
+                .then(() => {
+                    res.status(200).json({'Ok:': 'Utilisateur supprimé avec succès'});
+                })
+                
             })
         }
     }).catch((e) => res.status(500).json({e}));

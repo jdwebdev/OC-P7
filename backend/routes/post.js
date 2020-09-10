@@ -12,6 +12,7 @@ router.put('/', auth, multer, postCtrl.updatePost);
 router.delete('/', auth, multer, postCtrl.deletePost);
 
 router.get('/like/:userId/:postId', auth, likeCtrl.getLike);
+router.get('/dislike/:userId/:postId', auth, likeCtrl.getDislike);
 router.post('/like/new', auth, likeCtrl.likePost); 
 router.post('/dislike/new', auth, likeCtrl.dislikePost); 
 
