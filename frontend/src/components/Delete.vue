@@ -15,7 +15,6 @@
 import { mapState } from 'vuex'
 import router from '@/router/index.js'
 
-
 export default {
     Name: 'Delete',
     props: {
@@ -56,11 +55,9 @@ export default {
 
                 default:
                     console.log('Erreur, mauvais panelType')
-
             }
         },
         deleteUser() {
-
             const userId = this.displayedUserId
             const data = JSON.stringify({
                 userId
@@ -93,8 +90,7 @@ export default {
                     router.push('/')
                 }
                 
-            }).catch(() => console.log('error avec FETCH ?'))
-
+            }).catch(() => console.log('error'))
         },
         deletePost() {
             const postId = this.postId
@@ -114,10 +110,9 @@ export default {
             }).then(() => {
                 this.$emit('closePanelEvent')
                 this.$emit('refreshWallEvent')
-            }).catch(() => console.log('error avec FETCH ?'))
+            }).catch(() => console.log('error'))
         },
         deleteComment() {
-
             const commentId = this.commentId
             const data = JSON.stringify({
                 commentId
@@ -136,7 +131,7 @@ export default {
             }).then(() => {
                 this.$emit('closePanelEvent')
                 this.$emit('refreshWallEvent')
-            }).catch(() => console.log('error avec FETCH ?'))
+            }).catch(() => console.log('error'))
         }
     },
     computed: {
@@ -168,7 +163,7 @@ export default {
         width: 30%;
         background-color: #fff;
         padding: 1rem;
-        
+        text-align: center;
     }
 
     .deletePanel__img {

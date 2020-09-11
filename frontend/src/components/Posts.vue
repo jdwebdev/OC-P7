@@ -2,15 +2,13 @@
     <div class="postSection">
         <div class="postSection__header">
             <img class="postSection__profileImg" :src="userImgUrl" />
-            <h3 class="postSection__username"><router-link class="postSection__router" :to="`/Profile/${postUserId}`" title="Voir le profil">{{ postUsername }} Id: {{ postId }}</router-link></h3>
+            <h3 class="postSection__username"><router-link class="postSection__router" :to="`/Profile/${postUserId}`" title="Voir le profil">{{ postUsername }}</router-link></h3>
             <div v-if="username == postUsername || isAdmin == 1" class="postSection__editDeleteBtns">
                 <div :class="`postSection__edit postEdit-${postId}`" @click="toggleModal()" title="Éditer le post"><i class="fas fa-edit"></i></div>
                 <div :class="`postSection__delete postDelete-${postId}`" @click="toggleDeletePanel()" title="Supprimer le post"><i class="fas fa-trash-alt"></i></div>
             </div>
         </div>
-        
         <p class="postSection__date">{{ dateFormat('date') }} : {{ dateFormat('time') }}</p>
-        
         <div class="separation"></div>
         <p class="postSection__content">{{ content }}</p>
         <img v-if="imageUrl" class="postSection__image" :src="imageUrl">
@@ -342,16 +340,16 @@ export default {
         margin-right: 1rem;
     }
     .postSection__username {
-        background-color: #aaa;
+        background-color: #D1515A;
         border-radius: 1rem;
         text-align: center;
         padding: 0.5rem 0.7rem;
-        
         margin-bottom: 0.5rem;
     }
     .postSection__router {
         text-decoration: none;
         font-size: 0.9rem;
+        color:#fff;
     }
 
     .postSection__date {
@@ -372,13 +370,20 @@ export default {
         left: 40%;
         cursor: pointer;
     }
-    
 
+    .postSection__edit {
+        color: #3c557c;
+    }
+
+    .postSection__delete {
+        color: #D1515A;
+    }
+    
     .postSection__edit:hover {
         color: blue;
     }
     .postSection__delete:hover {
-        color:red;
+        color: red;
     }
 
     .postSection__content {
@@ -396,7 +401,7 @@ export default {
     }
     .separation {
         height: 2px;
-        background-color: black;
+        background-color: #3c557c;
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
     }
@@ -411,7 +416,7 @@ export default {
     }
 
     .commentSection {
-        background-color: #777;
+        background-color: #3c557c;
         padding: 0.5rem;
         margin-top: 1rem;
         border-radius: 0 0 1rem 1rem

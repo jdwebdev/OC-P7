@@ -92,7 +92,6 @@ export default {
     }
 
     @media screen and (max-width: 768px) {
-
         .signupDiv {
             width: 90vw;
         }

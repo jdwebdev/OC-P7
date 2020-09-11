@@ -8,7 +8,7 @@
             <textarea id="post" type="text" />
             <div class="postBtns">
                 <p class="wall__imgError" v-if="imgFormatError">Mauvais format ! Formats acceptés jpg, jpeg, png ou gif</p>
-                <label for="insertImg">Insérer une image :</label>
+                <label for="insertImg">Insérer une image : </label>
                 <input class="insertFile" id="insertImg" type="file" />
                 <button class="postBtn" @click="submitPost($event)">Poster</button>     
             </div>
@@ -29,7 +29,6 @@
             :key="post.id"
             @refreshWallEvent="getAllPosts" 
         />
-
     </div>
 </template>
 
@@ -82,7 +81,6 @@ export default {
                 }
             }
             
-
             const formData = new FormData()
             formData.append('id', id)
             formData.append('content', content)
@@ -154,22 +152,23 @@ export default {
         padding: 0.5rem;
         border: none;
         border-radius: 0.5rem;
-        background-color: #fd502c;
+        background-color: #D1515A;
         margin-left: 1rem;
         margin-top: 1rem;
         margin-bottom: 1rem;
         cursor: pointer;
+        color: #fff;
     }
 
     .wall__router {
         font-size: 0.8rem;
         text-decoration: none;
-        background-color: #fff;
+        background-color: #3c557c;
         padding: 0.5rem;
         border-radius: 0.5rem;
         margin-top: 1rem;
         margin-bottom: 1rem;
-        color: black;
+        color: #fff;
     }
 
     .wall__imgError {
@@ -191,12 +190,13 @@ export default {
         height: 4rem;
     }
     .postBtns {
-        background-color: #777;
+        background-color: #3c557c;
         width: 80%;
         padding: 1rem;
     }
     .postBtns label {
         font-size: 0.8rem;
+        color: #fff;
     }
     .postBtn {
         padding: 0.5rem;

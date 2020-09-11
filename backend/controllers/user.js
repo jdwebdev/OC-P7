@@ -5,10 +5,8 @@ const models = require('../models');
 const { Op } = require('sequelize');
 require("dotenv").config();
 
-//Constants
 const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const PASSWORD_REGEX = /^(?=.*\d).{4,8}$/;
-
 
 exports.signup = (req, res, next) => {
     
@@ -225,12 +223,12 @@ exports.deleteUser = (req, res) => {
                 })
                 .then( likedPosts => {
                     if (likedPosts) {
-                        likedPosts.forEach( post => {
+                        for (const post of likedPosts) {
                             post.decrement('likes')
                             .then(() => {
-                                console.log('decrement')
+                                console.log('decrement likes')
                             })
-                        })
+                        }
                     }
 
                     // Décrémenter ses dislikes des posts
@@ -247,28 +245,27 @@ exports.deleteUser = (req, res) => {
                     })
                     .then( dislikedPosts => {
                         if (dislikedPosts) {
-                            dislikedPosts.forEach( post => {
+                            for (const post of dislikedPosts) {
                                 post.decrement('dislikes')
                                 .then(() => {
-                                    console.log('decrement')
+                                    console.log('decrement dislikes')
                                 })
-                            })
+                            }
                         }
                     })
+                    .then(() => {
+                        // Supprimer son image utilisateur
+                        if (user.imageUrl) {
+                            const filename = user.imageUrl.split('/images/')[1];
+                            fs.unlinkSync(`images/${filename}`);
+                        }
+                        // Destruire l'utilisateur, réaction en cascade qui détruit tous ses posts, commentaires et likes/dislikes
+                        user.destroy()
+                        .then(() => {
+                            return res.status(200).json({'Ok:': 'Utilisateur supprimé avec succès'});
+                        })
+                    })
                 })
-
-                // Supprimer son image utilisateur
-                if (user.imageUrl) {
-                    const filename = user.imageUrl.split('/images/')[1];
-                    fs.unlinkSync(`images/${filename}`);
-                }
-
-                // Destruire l'utilisateur, réaction en cascade qui détruit tous ses posts, commentaires et likes/dislikes
-                user.destroy()
-                .then(() => {
-                    res.status(200).json({'Ok:': 'Utilisateur supprimé avec succès'});
-                })
-                
             })
         }
     }).catch((e) => res.status(500).json({e}));

@@ -152,6 +152,13 @@ export default {
         margin-right: 0.7rem;
         cursor: pointer;
     }
+    .singleComment__edit {
+        color: #3c557c;
+    }
+
+    .singleComment__delete {
+        color: #D1515A;
+    }
     .singleComment__edit:hover {
         color: blue;
     }
@@ -163,13 +170,11 @@ export default {
     }
 
     @media screen and (max-width: 768px) {
-
         .singleComment__editDeleteBtns {
             font-size: 1.2rem;
         }
         .singleComment__content {
             font-size:0.8rem;
         }
-
     }
 </style>

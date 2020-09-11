@@ -8,13 +8,11 @@ module.exports = (req, res, next) => {
         const userId = decodedToken.userId;
 
         if(req.params.id && req.params.id != userId) {
-            console.log('req.params dame')
             throw 'ID utilisateur non valable !';
         } else {
             next();
         }
     } catch (error) {
-        console.log('authProfile error !');
         res.status(401).json({ error });
     }
 };

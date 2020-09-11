@@ -19,7 +19,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import SignupForm from '@/components/SignupForm.vue'
 import LoginForm from '@/components/LoginForm.vue'
 import { mapState } from 'vuex'

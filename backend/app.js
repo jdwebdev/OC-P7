@@ -15,7 +15,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
 app.use(bodyParser.urlencoded({ extended: true })); // Forcer le parse dans des objets inclus dans d'autres
 app.use(bodyParser.json()); 
 

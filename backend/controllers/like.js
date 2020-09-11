@@ -50,6 +50,14 @@ exports.getDislike = (req, res) => {
     .catch(() => res.status(404).json({ 'Error': 'Avis introuvables' })) 
 }
 
+/*
+    LikePost :
+    Cherche le post correspondant à celui qu'on a aimé
+    Cherche l'utilisateur actuel, celui qui a cliqué
+    Vérifier dans la table likes s'il n'existe pas déjà un like correspondant à la fois à ce post ET à cet utilisateur
+        S'il n'y en a pas on peut créer le nouveau like dans la table likes, puis incrémentation de la colonne likes du post
+        S'il y en a déjà un cela signifie que cet utilisateur a déjà aimé ce post, on supprime donc le like de la table likes, puis décrémentation de la colonne likes du post
+*/
 exports.likePost = (req,res) => {
     const postId = req.body.postId;
     const userId = req.body.userId; 
@@ -154,5 +162,4 @@ exports.dislikePost = (req,res) => {
         .catch(() => res.status(404).json({ 'Error': 'Utilisateur introuvable' }));
     })
     .catch(() => res.status(404).json({ 'Error': 'Post introuvable' }));
-
 }

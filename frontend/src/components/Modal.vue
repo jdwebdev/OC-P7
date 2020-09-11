@@ -100,7 +100,7 @@ export default {
                     }).then(() => {
                         this.$emit('toggleModalEvent')
                         this.$emit('refreshWallEvent')
-                    }).catch(() => console.log('error avec FETCH ?'))
+                    }).catch(() => console.log('error'))
                 }
             } else if (this.modalType == 'commentaire') {
 
@@ -113,20 +113,19 @@ export default {
                 })
 
                 fetch(`http://localhost:3000/api/comments`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${this.token}`
-                        },
-                        mode:'cors',
-                        body: data
-                    }).then((response) => {
-                        return response.json()
-                    }).then(() => {
-                        this.$emit('toggleModalEvent')
-                        this.$emit('refreshWallEvent')
-                    }).catch(() => console.log('error avec FETCH ?'))
-
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.token}`
+                    },
+                    mode:'cors',
+                    body: data
+                }).then((response) => {
+                    return response.json()
+                }).then(() => {
+                    this.$emit('toggleModalEvent')
+                    this.$emit('refreshWallEvent')
+                }).catch(() => console.log('error'))
             }
         }
     },
@@ -147,7 +146,6 @@ export default {
         width: 100%;
         height: 100%;
         background-color: rgba(50,50,50, 0.5);
-
         display:flex;
         justify-content: center;
         align-items: center;
@@ -207,7 +205,6 @@ export default {
         cursor: pointer;
     }
     @media screen and (max-width: 768px) {
-
         .modal__content {
             width: 95%;
         }

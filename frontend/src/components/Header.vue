@@ -16,7 +16,7 @@ export default {
 <style>
     header {
         height: 100px;
-        background-color: #444;
+        background-color: #354c6e;
         padding: 1rem;
         font-family: 'Lato', sans-serif;
     }
@@ -39,7 +39,7 @@ export default {
     .header__title {
         font-size: 2rem;
         font-weight: bolder;
-        color: #fd502c;
+        color: #d1515a;
         margin-left: 2rem;
     }
 

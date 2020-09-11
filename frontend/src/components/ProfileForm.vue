@@ -8,14 +8,13 @@
         <input id="profileImg" type="file" />
 
         <label for="aboutMe">À propos de moi :</label>
-        <textarea id="aboutMe" type="text" :value="`${aboutMe}`"/>
+        <textarea id="aboutMe" type="text" :value="`${aboutMe ? aboutMe : ''}`"/>
 
         <button class="profileForm__btn" @click="updateProfile($event)">Confirmer</button>
     </form>
 </template>
 
 <script>
-
 export default {
     name: 'ProfileForm',
     data () {
@@ -78,9 +77,10 @@ export default {
                 body: formData
             }).then((response) => {
                 return response.json()
-            }).then((r) => {
-                console.log(r)
-                console.log('req fini')
+            }).then(() => {
+                if (this.username != username) {
+                    this.$store.commit('CHANGE_USERNAME', username)
+                }
                 this.$emit('updateBtnEvent')
                 this.$emit('getProfileEvent')
                 

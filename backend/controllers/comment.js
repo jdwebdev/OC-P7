@@ -1,30 +1,5 @@
 const models = require('../models');
 
-exports.getComments = (req, res) => {
-
-    const postId = req.params.postId;
-    const fields = req.query.fields;
-    const limit = parseInt(req.query.limit);
-    const order = req.query.order;
-
-    models.Comment.findAll({
-        order: [(order != null) ? order.split(':') : ['createdAt', 'ASC']],
-        attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
-        limit: (!isNaN(limit)) ? limit : null,
-        include: [{
-            model: models.User,
-            attributes: [ 'username' ]
-        }],
-        where: { postId: postId }
-    }).then((comments) => {
-        if (comments) {
-            return res.status(200).json({comments});
-        } else {
-            return res.status(404).json({ 'error': 'Aucun commentaire disponible' });
-        }
-    }).catch((e) => res.status(500).json({e}));
-}
-
 exports.createComment = (req, res) => {
     const content = req.body.content;
     const userId = req.body.userId;

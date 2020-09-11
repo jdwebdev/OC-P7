@@ -15,8 +15,6 @@ const storage = multer.diskStorage({
         const name = file.originalname.split(' ').join('_'); 
         const extension = MIME_TYPES[file.mimetype];
         if (!extension) {
-            console.log('extension:')
-            console.log(extension)
             return 'Erreur : Le type de fichier est incorrect'
         }
         callback(null, name + Date.now() + '.' + extension);

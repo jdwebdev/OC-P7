@@ -34,7 +34,6 @@ import { mapState } from 'vuex'
 import ProfileForm from '../components/ProfileForm.vue'
 import Delete from '../components/Delete.vue'
 
-
 export default {
     name: 'Profile',
     data () {

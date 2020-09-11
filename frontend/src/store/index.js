@@ -16,6 +16,9 @@ export default new Vuex.Store({
       state.username = user.username,
       state.token = user.token,
       state.isAdmin = user.isAdmin
+    },
+    CHANGE_USERNAME(state, username) {
+      state.username = username
     }
   },
   actions: {

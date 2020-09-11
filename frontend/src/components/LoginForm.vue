@@ -63,7 +63,6 @@ export default {
                 } else if (user.error == 'Mot de passe incorrect'){
                     this.displayWrongPassword = true;
                 }
-                
             }).catch((e) => console.log(e))
         },
         saveUser(user){

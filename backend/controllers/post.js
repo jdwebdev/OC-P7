@@ -8,7 +8,6 @@ exports.createPost = (req, res, next) => {
     const content = req.body.content;
     const imageUrl = req.file ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}` : null;
     
-
     models.User.findOne({
         where: { id: userId }
     }).then ((user) => {
