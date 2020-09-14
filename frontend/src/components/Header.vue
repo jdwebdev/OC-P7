@@ -1,7 +1,7 @@
 <template>
     <header>
         <div class="header__div">
-            <img class="header__img" src='../assets/icon90.png' />
+            <img class="header__img" src='../assets/icon150.png' alt="Logo Groupomania" />
             <h1 class="header__title">Groupomania</h1>
         </div>
     </header>
@@ -16,7 +16,7 @@ export default {
 <style>
     header {
         height: 100px;
-        background-color: #354c6e;
+        background-color: #142948;
         padding: 1rem;
         font-family: 'Lato', sans-serif;
     }
@@ -39,7 +39,7 @@ export default {
     .header__title {
         font-size: 2rem;
         font-weight: bolder;
-        color: #d1515a;
+        color: red;
         margin-left: 2rem;
     }
 

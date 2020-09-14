@@ -1,7 +1,7 @@
 <template>
     <div class="singleComment">
         <div class="singleComment__userInfo">
-            <img class="singleComment__profileImg" :src="userImgUrl" />
+            <img class="singleComment__profileImg" alt="Image de profil" :src="userImgUrl" />
             <h3 class="singleComment__username"><router-link class="singleComment__router" :to="`/Profile/${commentUserId}`" >{{ username }}</router-link></h3>
         </div>
         <div v-if="username == currentUser || isAdmin == 1" class="singleComment__editDeleteBtns">

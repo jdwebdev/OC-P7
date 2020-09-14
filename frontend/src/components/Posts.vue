@@ -1,7 +1,7 @@
 <template>
     <div class="postSection">
         <div class="postSection__header">
-            <img class="postSection__profileImg" :src="userImgUrl" />
+            <img class="postSection__profileImg" alt="Image de profil" :src="userImgUrl" />
             <h3 class="postSection__username"><router-link class="postSection__router" :to="`/Profile/${postUserId}`" title="Voir le profil">{{ postUsername }}</router-link></h3>
             <div v-if="username == postUsername || isAdmin == 1" class="postSection__editDeleteBtns">
                 <div :class="`postSection__edit postEdit-${postId}`" @click="toggleModal()" title="Éditer le post"><i class="fas fa-edit"></i></div>
@@ -11,7 +11,7 @@
         <p class="postSection__date">{{ dateFormat('date') }} : {{ dateFormat('time') }}</p>
         <div class="separation"></div>
         <p class="postSection__content">{{ content }}</p>
-        <img v-if="imageUrl" class="postSection__image" :src="imageUrl">
+        <img v-if="imageUrl" alt="Image postée par l'utilisateur" class="postSection__image" :src="imageUrl">
         <div class="likeDislike">
             <span :class="`thumbUp-${postId}`" @click="likeDislike($event)"><i class="far fa-thumbs-up"></i> {{ likes }}</span>
             <span :class="`thumbDown-${postId}`" @click="likeDislike($event)"><i class="far fa-thumbs-down"></i> {{ dislikes }}</span>
